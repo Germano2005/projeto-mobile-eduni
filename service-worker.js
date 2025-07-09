@@ -1,6 +1,5 @@
-
-const version = 1
-const cachename = 'app-cache-v'+version
+const version = 1;
+const cachename = 'app-cache-v' + version;
 
 const arquivos = [
     "./",
@@ -11,11 +10,8 @@ const arquivos = [
     "./style.css",
     "./imagens/logo192.png",
     "./imagens/logo512.png"
-]
+];
 
-/**
- * Cria o cache dos arquivos
- */
 self.addEventListener('install', function(event) {
     event.waitUntil(
         caches.open(cachename).then(function(cache) {
@@ -25,20 +21,39 @@ self.addEventListener('install', function(event) {
 });
 
 self.addEventListener('fetch', function(event) {
-    event.respondWith(caches.match(event.request).then(function(response) {
-        if (response !== undefined) {
-            return response;
-        } else {
-            return fetch(event.request).then(function (response) {
-                let responseClone = response.clone();
+    const apiUrl = '/api'; // Rota da sua API
 
-                caches.open(cachename).then(function (cache) {
-                    cache.put(event.request, responseClone);
+    // Se for a API, usa estratégia "NetworkFirst" (busca da rede, depois cache)
+    if (event.request.url.includes(apiUrl)) {
+        event.respondWith(
+            fetch(event.request)
+                .then((response) => {
+                    // Atualiza o cache com a resposta da API
+                    const responseClone = response.clone();
+                    caches.open(cachename).then((cache) => {
+                        cache.put(event.request, responseClone);
+                    });
+                    return response;
+                })
+                .catch(() => {
+                    // Se offline, retorna dados cacheados (se existirem)
+                    return caches.match(event.request);
+                })
+        );
+    } else {
+        // Para outros arquivos (CSS, JS, etc.)
+        event.respondWith(
+            caches.match(event.request).then(function(response) {
+                return response || fetch(event.request).then(function(fetchResponse) {
+                    let responseClone = fetchResponse.clone();
+                    caches.open(cachename).then(function(cache) {
+                        cache.put(event.request, responseClone);
+                    });
+                    return fetchResponse;
+                }).catch(function() {
+                    return caches.match('./index.html'); // Fallback offline
                 });
-                return response;
-            }).catch(function () {
-                return caches.match('./index.html');
-            });
-        }
-    }));
+            })
+        );
+    }
 });
