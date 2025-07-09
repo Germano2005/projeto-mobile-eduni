@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://a81c10d5b8ec.ngrok-free.app/api';  // Altere para a URL da sua API
+const API_BASE_URL = 'https://4b140882400b.ngrok-free.app/api';  // Altere para a URL da sua API
 
 // Templates e rotas simplificadas
 const templates = {
