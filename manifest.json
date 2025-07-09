@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json.schemastore.org/web-manifest",
+  "short_name": "EDUNI",
+  "name": "Rede Social - EDUNI",
+  "description": "Versão mobile PWA da sua rede social",
+  "scope": "./",
+  "icons": [
+    {
+      "src": "imagens/logo192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "imagens/logo512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "background_color": "#dee2e6",
+  "theme_color": "#32a041",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait"
+}
