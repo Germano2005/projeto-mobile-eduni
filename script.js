@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://172.16.136.97:8081/api';  // Altere para a URL da sua API
+const API_BASE_URL = 'https://10.0.0.161:8081/api';  // Altere para a URL da sua API
 
 // Templates e rotas simplificadas
 const templates = {
