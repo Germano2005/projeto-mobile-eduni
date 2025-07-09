@@ -23,36 +23,25 @@ self.addEventListener('install', function(event) {
 self.addEventListener('fetch', function(event) {
     const apiUrl = '/api'; // Rota da sua API
 
-    // Se for a API, usa estratégia "NetworkFirst" (busca da rede, depois cache)
+    // Se for requisição para a API
     if (event.request.url.includes(apiUrl)) {
+        // Estratégia Network-Only para a API (nunca usa cache)
         event.respondWith(
             fetch(event.request)
-                .then((response) => {
-                    // Atualiza o cache com a resposta da API
-                    const responseClone = response.clone();
-                    caches.open(cachename).then((cache) => {
-                        cache.put(event.request, responseClone);
-                    });
-                    return response;
-                })
                 .catch(() => {
-                    // Se offline, retorna dados cacheados (se existirem)
-                    return caches.match(event.request);
+                    // Se offline e for API, mostra mensagem específica
+                    return new Response(JSON.stringify({
+                        message: "Você está offline. Os dados da API não estão disponíveis."
+                    }), {
+                        headers: {'Content-Type': 'application/json'}
+                    });
                 })
         );
     } else {
-        // Para outros arquivos (CSS, JS, etc.)
+        // Para outros arquivos (CSS, JS, etc.) - estratégia Cache First
         event.respondWith(
             caches.match(event.request).then(function(response) {
-                return response || fetch(event.request).then(function(fetchResponse) {
-                    let responseClone = fetchResponse.clone();
-                    caches.open(cachename).then(function(cache) {
-                        cache.put(event.request, responseClone);
-                    });
-                    return fetchResponse;
-                }).catch(function() {
-                    return caches.match('./index.html'); // Fallback offline
-                });
+                return response || fetch(event.request);
             })
         );
     }
